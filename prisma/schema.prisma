@@ -1,0 +1,80 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  transactions  Transaction[]
+  missions      Mission[]
+  tradeJournals TradeJournal[]
+  todos         Todo[]
+}
+
+model Transaction {
+  id        Int      @id @default(autoincrement())
+  title     String
+  amount    Float    @default(0.0)
+  type      String   // "income" หรือ "expense"
+  date      String   // รูปแบบ "YYYY-MM-DD"
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  category  String?
+  startTime   String?
+  endTime     String?
+
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id])
+
+  @@map("transactions")
+}
+
+model Mission {
+  id        Int      @id @default(autoincrement())
+  text      String
+  completed Boolean  @default(false)
+  category  String   // 'dev', 'trade', 'fitness'
+  date      String   // เก็บเป็นฟอร์แมต "YYYY-MM-DD" เพื่อใช้ Map และค้นหาตามวัน
+  createdAt DateTime @default(now())
+
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id])
+}
+
+// 📊 โมเดลบันทึกประวัติเทรดพร้อมระบบแนบรูปคู่ (Plan vs Result)
+model TradeJournal {
+  id        Int      @id @default(autoincrement())
+  pair      String   // ตัวอย่าง: "XAUUSD", "BTCUSDT"
+  result    String   // "WIN" หรือ "LOSS"
+  pnl       Float    // เก็บยอดดอลลาร์ ($)
+  date      String   // รูปแบบ "YYYY-MM-DD"
+  time      String   // รูปแบบ "HH:MM"
+  session   String   // "ASIA", "LONDON", "NY"
+  planImg   String?  @db.Text // ใช้ @db.Text (PostgreSQL) เพื่อรองรับ Base64 สตริงขนาดยาวได้ไม่มีตัด
+  resultImg String?  @db.Text // ใช้ @db.Text รองรับรูปภาพผลลัพธ์
+  notes     String?  @db.Text // บันทึกสภาวะอารมณ์หรือ Confluence
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id])
+
+  @@map("trade_journals")
+}
+
+model Todo {
+  id          Int      @id @default(autoincrement())
+  title       String
+  date        String   // เก็บวันที่ YYYY-MM-DD
+  isCompleted Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id])
+}
