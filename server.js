@@ -14,7 +14,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 // 2. ปรับ CORS ให้รองรับเฉพาะโดเมนหน้าบ้านของคุณ
 const allowedOrigins = [
   'http://localhost:3000', // สำหรับ Dev ในเครื่อง
-  'https://luxury-trader-frontend.vercel.app/' // 📍 ใส่ URL หน้าบ้าน Vercel ของคุณตรงนี้!
+  'https://luxury-trader-frontend.vercel.app' // 📍 ใส่ URL หน้าบ้าน Vercel ของคุณตรงนี้!
 ];
 
 app.use(cors({
