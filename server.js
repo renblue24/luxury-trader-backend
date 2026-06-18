@@ -6,29 +6,10 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
 const prisma = new PrismaClient();
-
-// 1. ตั้งค่า PORT ให้ Render ใช้งานได้
-const PORT = process.env.PORT || 3024; 
+const PORT = 3024;
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// 2. ปรับ CORS ให้รองรับเฉพาะโดเมนหน้าบ้านของคุณ
-const allowedOrigins = [
-  'http://localhost:3000', // สำหรับ Dev ในเครื่อง
-  'https://luxury-trader-frontend.vercel.app' // 📍 ใส่ URL หน้าบ้าน Vercel ของคุณตรงนี้!
-];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  credentials: true
-}));
-
+app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
 
