@@ -6,10 +6,29 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
 const prisma = new PrismaClient();
-const PORT = 3024;
+
+// 1. ตั้งค่า PORT ให้ Render ใช้งานได้
+const PORT = process.env.PORT || 3024; 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-app.use(cors());
+// 2. ปรับ CORS ให้รองรับเฉพาะโดเมนหน้าบ้านของคุณ
+const allowedOrigins = [
+  'http://localhost:3000', // สำหรับ Dev ในเครื่อง
+  'https://luxury-trader-backend.vercel.app' // 📍 ใส่ URL หน้าบ้าน Vercel ของคุณตรงนี้!
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  credentials: true
+}));
+
 app.use(express.json({ limit: '10mb' }));
 
 
@@ -552,6 +571,5 @@ app.delete('/todos/:id', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`=========================================`);
   console.log(`🚀 STAYHARD BACKEND LIVE ON PORT: ${PORT}`);
-  console.log(`🔗 AI REALTIME ENGINE HUB ACTIVATED`);
   console.log(`=========================================`);
 });
